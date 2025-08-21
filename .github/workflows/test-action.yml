@@ -1,0 +1,42 @@
+# This is a basic workflow that is manually triggered
+
+name: test Action
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+    inputs:
+      who-to-greet: 
+        default: '@wulfland'
+        required: true
+  push:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "greet"
+  test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Runs a single command using the runners shell
+    - name: Checkout repo to run actions locally
+      uses: actions/checkout@v3.5.3
+
+    - name: Run my container action
+      id: action
+      uses: ./
+      with:
+        who-to-greet: '@wulfland'
+
+    - name: Output the answer
+      run: echo "The answer is ${{ steps.action.outputs.answer }}
+
+    - name: Test the container
+      if: ${{ steps.action.outputs.answer != 42 }}
+      run: |
+          echo "::error file=entrypoint.sh,line=4,title=Error in container::The answer was not expected"
+          exit 1
+      
